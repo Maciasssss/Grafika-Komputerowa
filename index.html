@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CPSC 424, Lab 2, Exercise 1</title>
+<style>
+  
+    body {
+        background-color: #DDDDDD;
+    }
+    canvas {
+        background-color: rgb(236, 231, 231);
+        display: block;
+    }
+    #canvasholder {
+        border:2px solid #000000;
+        float: left; /* This makes the border exactly fit the canvas. */
+    }
+</style>
+<script>
+
+    function draw() 
+    {
+        graphics.clearRect(0,0,600,600);
+        graphics.strokeStyle="#000";
+        graphics.fillStyle="#000";
+        graphics.fillText("Helloworld",20,20);
+        drawstar(160,160,60,"#000",55);
+        drawstar(160,160,50,"#bddd0a",55);
+        graphics.strokeRect(100,100,300,200);
+        graphics.fillOval();
+        
+    } 
+    function drawstar(x,y,radius,color,angle)
+     {
+         graphics.fillStyle = color;
+         graphics.beginPath();
+          graphics.moveTo(x+radius * Math.cos(0+angle),y+radius * Math.sin(0+angle));
+          for(var i =1; i <= 5; i++)
+          {
+              graphics.lineTo(x + radius * Math.cos(i*4*Math.PI/5+angle),y+radius * Math.sin(i*4*Math.PI/5+angle));
+          }
+           graphics.closePath();
+           graphics.fill();
+       }
+    
+    function applyWindowToViewportTransformation(left,right,bottom,top,preserveAspect) {
+        var displayAspect, windowAspect;
+        var excess;
+        var pixelwidth, pixelheight;
+        if (preserveAspect) {
+            // Adjust the limits to match the aspect ratio of the drawing area.
+            displayAspect = Math.abs(canvas.height / canvas.width);
+            windowAspect = Math.abs(( top-bottom ) / ( right-left ));
+            if (displayAspect > windowAspect) {
+                // Expand the viewport vertically.
+                excess = (top-bottom) * (displayAspect/windowAspect - 1);
+                top = top + excess/2;
+                bottom = bottom - excess/2;
+            }
+            else if (displayAspect < windowAspect) {
+                // Expand the viewport vertically.
+                excess = (right-left) * (windowAspect/displayAspect - 1);
+                right = right + excess/2;
+                left = left - excess/2;
+            }
+        }
+        graphics.scale( canvas.width / (right-left), canvas.height / (bottom-top) );
+        graphics.translate( -left, -top );
+        pixelwidth =  Math.abs(( right - left ) / canvas.width);
+        pixelheight = Math.abs(( bottom - top ) / canvas.height);
+        pixelSize = Math.max(pixelwidth,pixelheight);
+    }  
+
+    function addGraphicsContextExtras(graphics) {
+        graphics.strokeLine = function(x1,y1,x2,y2) {
+           this.beginPath();
+           this.moveTo(x1,y1);
+           this.lineTo(x2,y2);
+           this.stroke();
+        }
+        graphics.fillCircle = function(x,y,r) {
+           this.beginPath();
+           this.arc(x,y,r,0,2*Math.PI,false);
+           this.fill();
+        }
+        graphics.strokeCircle = function(x,y,radius) {
+           this.beginPath();
+           this.arc(x,y,radius,0,2*Math.PI,false);
+           this.stroke();
+        }
+        graphics.fillPoly = function() { 
+            if (arguments.length < 6)
+               return;
+            this.beginPath();
+            this.moveTo(arguments[0],arguments[1]);
+            for (var i = 2; i+1 < arguments.length; i = i + 2) { 
+               this.lineTo(arguments[i],arguments[i+1]);
+            }
+            this.closePath();
+            this.fill();
+        }
+        graphics.strokePoly = function() { 
+            if (arguments.length < 4)
+               return;
+            this.beginPath();
+            this.moveTo(arguments[0],arguments[1]);
+            for (var i = 2; i+1 < arguments.length; i = i + 2) { 
+               this.lineTo(arguments[i],arguments[i+1]);
+            }
+            this.closePath();
+            this.stroke();
+        }
+        graphics.fillOval = function(x,y,horizontalRadius,verticalRadius) {
+           this.save();
+           this.translate(x,y);
+           this.scale(horizontalRadius,verticalRadius);
+           this.beginPath();
+           this.arc(0,0,1,0,2*Math.PI,false);
+           this.restore();
+           this.fill();
+        }
+        graphics.strokeOval = function(x,y,horizontalRadius,verticalRadius) {
+           this.save();
+           this.translate(x,y);
+           this.scale(horizontalRadius,verticalRadius);
+           this.beginPath();
+           this.arc(0,0,1,0,2*Math.PI,false);
+           this.restore();
+           this.stroke();
+        }
+        graphics.getRGB = function(x,y) {
+            var color = this.getImageData(x,y,1,1);
+            return color.data;
+        }
+    }    
+    function init() 
+    {
+
+        try {
+            canvas = document.getElementById("canvas");
+            graphics = canvas.getContext("2d");
+        } catch(e) {
+            document.getElementById("canvasholder").innerHTML =
+               "Canvas graphics is not supported.<br>" +
+               "An error occurred while initializing graphics.";
+        }
+        addGraphicsContextExtras(graphics);
+        draw();  // Call draw() to draw on the canvas.
+    }
+    
+</script>
+</head>
+<body onload="init()"> 
+
+<h2>CS 424, Lab 2, Exercise 1</h2>
+
+<div id="canvasholder">
+<canvas id="canvas" width="600" height="600">
+</canvas>
+</div>
+
+</body>
+</html>
